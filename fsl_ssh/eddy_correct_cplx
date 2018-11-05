@@ -1,0 +1,53 @@
+#!/bin/sh
+export LC_ALL=C
+
+Usage() {
+    echo ""
+    echo "Usage: eddy_correct_cplx <4dinput> <4doutput> <reference_no> [<interp>]"
+    echo "       Choose interp from {trilinear,spline} def - trilinear "
+    echo ""
+    exit
+}
+
+[ "$3" = "" ] && Usage
+
+interpm="trilinear"
+if [ $# -eq 4 ]; then
+    interpm=${4}
+fi
+
+input=`${FSLDIR}/bin/remove_ext ${1}`
+output=`${FSLDIR}/bin/remove_ext ${2}`
+ref=${3}
+
+if [ `${FSLDIR}/bin/imtest $input` -eq 0 ];then
+    echo "Input does not exist or is not in a supported format"
+    exit
+fi
+
+# 1. save abs, real, and imag parts of complex volumes
+
+fslcomplex -realabs $input ${input}_abs
+fslcomplex -realcartesian $input ${input}_real ${input}_imag
+
+# 2. do modified eddy_correct and same omat files
+
+sh /home/m165355/bin/eddy_correct ${input}_abs ${input}_abs_reg 0 $interpm
+
+
+# 3. apply transformation on real and imag volumes using the omat files saved
+
+sh /home/m165355/bin/apply_eddy_correct ${input}_real ${input}_abs_reg 0 $interpm
+mv ${input}_abs_reg.nii.gz ${input}_real_reg.nii.gz
+
+sh /home/m165355/bin/apply_eddy_correct ${input}_imag ${input}_abs_reg 0 $interpm
+
+mv ${input}_abs_reg.nii.gz ${input}_imag_reg.nii.gz
+
+# combine to complex
+
+fslcomplex -complex ${input}_real_reg ${input}_imag_reg $output
+
+
+
+

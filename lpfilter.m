@@ -8,6 +8,13 @@ end
 if nargin <3
     alpha = 3;
 end
+
+if numel(dim)>1
+    for k=1:numel(dim)
+        cimgs = lpfilter(cimgs,dim(k),alpha);
+    end
+    return;
+end
 cimgs(isnan(  cimgs))=0;
 CIMGS = fftshift(fft(fftshift(cimgs,dim),[],dim),dim);
 

@@ -4,7 +4,7 @@ function [ssh2_conn, command_result] = flirt_wrapper(varargin)
 %    FLIRT_WRAPPER(...,'omat', <matrix-filname>) saves affine matrix file
 %    FLIRT_WRAPPER(...,'applyxfm', [0|1], 'init', <matrix-filname> ) applies affine transform
 %    FLIRT_WRAPPER(...,'option',<flirt options>, 'ssh2_conn', <ssh2_conn>, 'verbose', [0|1])
-%    []FLIRT_WRAPPER(...,'run_in_bg', [0|1])  run command in background via parfeval()
+%    FLIRT_WRAPPER(...,'run_in_bg', [0|1])  run command in background via parfeval()
 %    [ssh2_conn, command_result] = FLIRT_WRAPPER(...) outputs ssh2 connection and command results
 %
 %    Examples:

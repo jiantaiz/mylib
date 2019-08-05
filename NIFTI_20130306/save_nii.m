@@ -176,9 +176,12 @@ function write_nii(nii, filetype, fileprefix, old_RGB)
       error('This datatype is not supported');
    end
    
-   hdr.dime.glmax = round(double(max(nii.img(:))));
-   hdr.dime.glmin = round(double(min(nii.img(:))));
-   
+   if ~isfield(hdr.dime,'glmax')
+        hdr.dime.glmax = round(double(max(nii.img(:))));
+   end
+   if ~isfield(hdr.dime,'glmin')
+        hdr.dime.glmin = round(double(min(nii.img(:))));
+   end
    if filetype == 2
       fid = fopen(sprintf('%s.nii',fileprefix),'w');
       

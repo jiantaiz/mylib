@@ -9,6 +9,9 @@ for k=3:numel(folder)
 end
 
 dcm = dir(fullfile(d,'*.MR'));
+if isempty(dcm)
+    dcm = dir(fullfile(d,'*.dcm'));
+end
 if ~isempty(dcm)
     mkdir(fullfile(d,'dcm'));
     
@@ -21,7 +24,11 @@ if ~isempty(dcm)
     sedesc = strrep(dinfo.SeriesDescription, ' ', '_');
     se_name = sprintf('s%04d_%s',seno,sedesc);
     se_name = matlab.lang.makeValidName(se_name);
-    getGEProtocolFromDicom(fullfile(d,dcm(1).name),d);
+    try
+      getGEProtocolFromDicom(fullfile(d,dcm(1).name),d);
+    catch
+      disp('Error when get protocol from dicom');  
+    end
     PS=printstruct(dinfo,'maxarray',24,'write',fullfile(d,'dicom_tags.txt'));
     
     if (isunix) %similar performance as java

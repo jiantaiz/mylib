@@ -63,7 +63,7 @@ if ~exist('f','var')|| isempty(f), f = 0.5; end
 if ~exist('dorobust','var') || isempty(dorobust) , dorobust = 0; end
 if ~exist('betopt','var')|| isempty(betopt), betopt = ''; end
 if nargin<1, mfile_showhelp; return; end
-if ~exist('ssh2_conn','var'), ssh2_conn = []; end
+if ~exist('ssh2_conn','var'), ssh2_conn=[]; end
 if dorobust
     betopt =[betopt,' -R']; %robust
 end

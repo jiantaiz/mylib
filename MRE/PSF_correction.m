@@ -8,9 +8,10 @@ end
 ro_dir=mod(pe_dir,2)+1;
 %PSF_data: [nx ny nz ns]
 % acc = 4;
-K = permute(PSF_data,[ro_dir pe_dir 4 3]);
+% K = permute(PSF_data,[ro_dir pe_dir 4 3]);
+K = permute(PSF_data,[ro_dir pe_dir 3 4]);
 %K : [nx ny ns nz]
-K = flip(K,3);
+% K = flip(K,3);
 [nx ny ns nz] = size(K);
 w = hanning(ns);
 w = reshape(w,[1 1 ns 1]);
@@ -23,7 +24,9 @@ IM(:,:,end+1:imsize,:)=0; %zero padding;
 IM = circshift(IM,[0 0 ceil((imsize-ns)/2) 0]);
 IM = ifftshift(ifft(fftshift(IM,dim),[],dim),dim);
 IM = repmat(IM, [1 1 acc 1]);
-IM = circshift(IM,[0, 0, floor(size(IM,3)/(2*acc)), 0]);
+% IM = circshift(IM,[0, 0, floor(size(IM,3)/(2*acc)), 0]);
+
+IM = flip(IM,3);
 %% water mask
 [nx ny ns nz] = size(IM);
 mask = zeros([ny ns]);
@@ -84,12 +87,18 @@ if ~isempty(MRE_data)
 else
     IMC=[];
 end
+IMw2 = abs(IMw(:,:,:,:)).^2 .*exp(1i*angle(IMw(:,:,:,:)));
+
 if nargout>3
-    EPI = squeeze(sqrt(sum(abs(IMw(:,:,:,:)).^2,2))); %EPI
+%     EPI = squeeze(sqrt(sum(abs(IMw(:,:,:,:)).^2,3))); %EPI
+    EPI = squeeze(sum(IMw2,3));
+    EPI = sqrt(abs(EPI)).*exp(1i*angle(EPI));
     EPI = permute(EPI,[ro_dir,pe_dir,3]);
 end
 if nargout>4
-    SE =  squeeze(sqrt(sum(abs(IMw(:,:,:,:)).^2,3)));
+%     SE =  squeeze(sqrt(sum(abs(IMw(:,:,:,:)).^2,2)));
+    SE = squeeze(sum(IMw2,2));
+    SE = sqrt(abs(SE)).*exp(1i*angle(SE));
     SE = permute(SE,[ro_dir,pe_dir,3]);
 end
 

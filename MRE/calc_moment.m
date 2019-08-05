@@ -30,7 +30,7 @@ end
 t0 = cp (:,1)/1e3;% convert usec to msec
 G0 = cp(:,2:end).*10 ; % convert Gs/cm to mT/m
 
-dt = 4e-3; %msec
+dt = 1e-4; %msec
 
 N= ceil (t0(end)/dt);
 

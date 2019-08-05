@@ -18,12 +18,12 @@ import java.io.File;
 
 
 import ch.ethz.ssh2.*;
-import ch.ethz.ssh2.Connection;
-import ch.ethz.ssh2.Session;
-import ch.ethz.ssh2.StreamGobbler;   
-import ch.ethz.ssh2.SCPClient;
-import ch.ethz.ssh2.SFTPv3Client;
-import ch.ethz.ssh2.SFTPv3FileHandle;
+import ch.ethz.ssh2.Connection.*;
+import ch.ethz.ssh2.Session.*;
+import ch.ethz.ssh2.StreamGobbler.*;   
+import ch.ethz.ssh2.SCPClient.*;
+import ch.ethz.ssh2.SFTPv3Client.*;
+import ch.ethz.ssh2.SFTPv3FileHandle.*;
 
 %% ASSUME SSH2.M HAS CHECKED SETUP
 %
@@ -324,6 +324,8 @@ if (ischar(ssh2_struct.command)) % we should send a command then.
         stdout = StreamGobbler(ssh2_struct.command_session.getStdout());
         br = BufferedReader(InputStreamReader(stdout));
         while(true)
+%         while(br.ready())
+            fprintf('*')
             line = br.readLine();
             if(isempty(line))
                 break

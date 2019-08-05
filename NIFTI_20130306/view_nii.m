@@ -2464,24 +2464,64 @@ return
 function save_to_gif(ax)
 % fig = varargin{3};
 nii_view = getappdata(gcf,'nii_view');
+imlineobj = findobj(nii_view.handles.axial_axes,'Tag','imline');
+imlineobj = [imlineobj findobj(nii_view.handles.coronal_axes,'Tag','imline')];
+imlineobj = [imlineobj findobj(nii_view.handles.sagittal_axes,'Tag','imline')];
+
 for k=1:nii_view.numscan
     set(nii_view.handles.contrast,'value',k);
     update_scanid(gcf, k);
     axil(:,:,k) = nii_view.handles.axial_image.CData;
     sag(:,:,k) = nii_view.handles.sagittal_image.CData;
     cor(:,:,k) = nii_view.handles.coronal_image.CData;
+    
+    for jj = 1:numel(imlineobj)
+        drawnow
+        ax = imlineobj(jj).UserData.plt.Parent;
+        ax.Units = 'pixels';
+        pos = ax.Position;
+        ti = ax.TightInset;
+        rect = [-ti(1), -ti(2), pos(3)+ti(1)+ti(3), pos(4)+ti(2)+ti(4)];
+        frames(k,jj) = getframe(ax,rect);
+    end
+    
 %     pause(0.8);
 end
 axil = flipud(axil);
 sag = flipud(sag); sag = fliplr(sag);
 cor = flipud(cor);
 clim = nii_view.handles.axial_axes.CLim;
-mat2gif(axil,'axil.gif','clim',clim,'cmap',awave(256),'DelayTime',0.1)
-mat2gif(sag,'sag.gif','clim',clim,'cmap',awave(256),'DelayTime',0.1)
-mat2gif(cor,'cor.gif','clim',clim,'cmap',awave(256),'DelayTime',0.1)
+resizefac = 3;
+warning('3x resize');
+cmap = colormap;
+DelayTime = 0.1;
+ProgressBar=false;
+mat2gif(axil,'axil.gif','clim',clim,'cmap',cmap,'DelayTime',DelayTime,'Resize',resizefac,'ProgressBar',ProgressBar)
+mat2gif(sag,'sag.gif','clim',clim,'cmap',cmap,'DelayTime',DelayTime,'Resize',resizefac,'ProgressBar',ProgressBar)
+mat2gif(cor,'cor.gif','clim',clim,'cmap',cmap,'DelayTime',DelayTime,'Resize',resizefac,'ProgressBar',ProgressBar)
+
+
+
+output_filename = 'xyplot.gif';
+LoopCount = inf;
+DelayTime = 0.1;
+if (exist('frames','var') && ~isempty(frames))
+    for k=1:nii_view.numscan
+        A = frames(k,1).cdata;
+        [A,cmap] = rgb2ind(A,256);
+        if k==1
+            imwrite(A, cmap, output_filename, 'LoopCount', LoopCount, 'DelayTime', DelayTime);
+        else
+            imwrite(A, cmap, output_filename, 'WriteMode', 'append', 'DelayTime', DelayTime);
+        end
+        
+    end
+    assignin('base','xyplot_frames',frames);
+end
 assignin('base','axil',axil);
 assignin('base','sag',sag);
 assignin('base','cor',cor);
+
 
 function timer_fcn(varargin)
 %     disp('varargin')
@@ -2497,24 +2537,24 @@ end
 set(nii_view.handles.contrast,'value',setscanid);
 update_scanid(fig, setscanid);
 
-imlineobj = findobj(fig,'Tag','imline');
-imfreehandobj =  findobj(fig,'Tag','imfreehand');
-
-for k = 1:numel(imlineobj)
-    api = iptgetapi(imlineobj(k));
-    feval(api.setPosition,feval(api.getPosition))
-end
-for k = 1:numel(imfreehandobj)
-    try
-        ud=get(imfreehandobj(k),'UserData');
-        
-        if isfield(ud,'xyplotwin') && ishandle(ud.xyplotwin) && strcmp(get(ud.xyplotwin,'type'),'figure')
-            fn = imfreehandobj(k).Children(end).UIContextMenu.Children(1).Callback;
-            feval(fn);
-            
-        end
-    end
-end
+% imlineobj = findobj(fig,'Tag','imline');
+% imfreehandobj =  findobj(fig,'Tag','imfreehand');
+% 
+% for k = 1:numel(imlineobj)
+%     api = iptgetapi(imlineobj(k));
+%     feval(api.setPosition,feval(api.getPosition))
+% end
+% for k = 1:numel(imfreehandobj)
+%     try
+%         ud=get(imfreehandobj(k),'UserData');
+%         
+%         if isfield(ud,'xyplotwin') && ishandle(ud.xyplotwin) && strcmp(get(ud.xyplotwin,'type'),'figure')
+%             fn = imfreehandobj(k).Children(end).UIContextMenu.Children(1).Callback;
+%             feval(fn);
+%             
+%         end
+%     end
+% end
 
 return
 
@@ -4614,6 +4654,26 @@ get(nii_view.handles.axial_axes,'clim');
 opt.glblocminmax = get(nii_view.handles.axial_axes,'clim');
 
 view_nii(fig, nii_view.nii.img, opt);
+
+imlineobj = findobj(fig,'Tag','imline');
+imfreehandobj =  findobj(fig,'Tag','imfreehand');
+
+for k = 1:numel(imlineobj)
+    api = iptgetapi(imlineobj(k));
+    feval(api.setPosition,feval(api.getPosition))
+end
+for k = 1:numel(imfreehandobj)
+    try
+        ud=get(imfreehandobj(k),'UserData');
+        
+        if isfield(ud,'xyplotwin') && ishandle(ud.xyplotwin) && strcmp(get(ud.xyplotwin,'type'),'figure')
+            fn = imfreehandobj(k).Children(end).UIContextMenu.Children(1).Callback;
+            feval(fn);
+            
+        end
+    end
+end
+
 
 return;					% update_scanid
 

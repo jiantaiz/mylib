@@ -42,7 +42,11 @@ end
 dirs = f([f.isdir]);
 if ~isempty(dirs)
     for k = 1:numel(dirs)
+        try
         ex_dirname = rename_dicomdir(fullfile(d,dirs(k).name));
+        catch
+            continue;
+        end
     end
     fullfile(d,'..',ex_dirname)
     ex_dirname

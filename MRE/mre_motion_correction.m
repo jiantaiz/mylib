@@ -1,20 +1,20 @@
 
-clear
-load('cimgs.mat')
+% clear
+% load('cimgs.mat')
 pdimg = cimgs(:,:,:,:,1:2:end) .* conj(cimgs(:,:,:,:,2:2:end));
 pdimg = sqrt(abs(pdimg)).*exp(1i*angle(pdimg));
 
 [pdimg_corr, omat]=ssh_motion_correction(pdimg(:,:,:,:),'spline');
 pdimg_corr = reshape(pdimg_corr,size(pdimg));
 pdimg_corr = flipud(pdimg_corr);
-
+%%
 
 % ov(abs(pdimg))
 % ov(angle(pdimg))
-TH=3;
+TH=2;
 FOV=240;
-coord=5;
-f=60;
+coord=0;
+f=80;
 FOVz_int = TH*size(pdimg,3);
 
 [magn, divergence, curlx, curly, curlz] = AA_Curl(pdimg(:,:,:,:,1), pdimg(:,:,:,:,2), pdimg(:,:,:,:,3),TH,FOV , coord);

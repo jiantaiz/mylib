@@ -50,8 +50,14 @@ if  ~exist('ssh2_conn','var')|| isempty(ssh2_conn)
     if nargout <1
         flag_close_ssh = true;
     end
-    ssh2_conn = ssh2_login('m165355',[],'mr-cim');
-    if isempty(ssh2_conn) % conceled
+    private_key = 'C:\Users\m165355\OneDrive\Mayo\Matlab\mr_cim_id_rsa';
+    if exist(private_key,'file') == 2
+        ssh2_conn = ssh2_config_publickey('mr-cim', 'm165355',private_key, '');
+    else
+        ssh2_conn = ssh2_login('m165355',[],'mr-cim');
+    end
+        
+    if isempty(ssh2_conn) % cancelled
         COMMAND_RESULT=[];
         return
     end

@@ -15,7 +15,7 @@ function [regvol,omat] = ssh_flirt(inputvol,inputvoxsize,refvol,refvoxsize,ssh2_
 %    [regvol omat] = ssh_flirt(inputvol,[1.875 1.875 3], refvol,[2 2 2],ssh2_conn);
 %
 %    [regvol omat] = ssh_flirt(inputvol,[1.875 1.875 3], refvol,[2 2 2],ssh2_conn,'-dof 6',1);% set dof=6, and verbose=1
-%    See also: flirt_wrapper
+%    See also: flirt_wrapper 
 
 % AUTHOR    : Yi Sui
 % DATE      : 06/26/2017

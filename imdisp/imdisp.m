@@ -129,8 +129,9 @@ end
 
 % Get limits, etc.
 if isnumeric(I) || islogical(I)
-    I= imresize(I,resize);
-    
+    if resize ~= 1
+        I= imresize(I,resize);
+    end
     if ~isreal(I)
         I=abs(I);
         warning('Complex number, only magnitude displayed');
@@ -418,8 +419,9 @@ try
     enableWL;
 end
 try
-
+if show_impixelinfo
     impixelinfo;
+end
 end
 return
 
@@ -512,7 +514,8 @@ switch lower(event_data.Character)
         return;
     case 'r'
         map=colormap;
-        colormap(map(end:-1:1,:));
+%         colormap(map(end:-1:1,:));
+        colormap(map([1,end:-1:2],:));
 %         map(2:end-1,:)= map(end-1:-1:2,:);
 %         colormap(map);
         return;
@@ -541,6 +544,22 @@ switch lower(event_data.Character)
                 set(state.hAx(a,b),'userdata',[]);
             end
         end
+        set(gcf,'Units','inches');
+        pos = get(gcf,'Position');
+        pos(1) = pos(1) + pos(3)/2;
+        pos(2) = pos(2) + pos(4);
+        pos(3) = 10;
+        pos(4) = pos(3)/layout(2)*layout(1);
+        pos(1) = pos(1) - pos(3)/2;      
+        pos(2) = pos(2) - pos(4);
+
+        set(gcf,'Position',pos);
+        set(gcf,'Units','pixels');
+        pos = get(gcf,'Position');
+        pos = round(pos);
+        pos(3) = round(pos(3)/layout(2))*layout(2);
+        pos(4) = round(pos(3)/layout(2)*layout(1));
+        set(gcf,'Position',pos);
         return;
     case '0'%default W/L
         set(findobj(fig,'Type','axes'),'Clim',state.lims);

@@ -1,4 +1,4 @@
-function [cimgs, dinfos]  = read_mre_dicom(folder,dcm_pattern,savemat)
+ function [cimgs, dinfos]  = read_mre_dicom(folder,dcm_pattern,savemat)
 % READ_MRE_DICOM reads in MRE data from GE dicom folder and 
 % save in cimgs(x,y,z,IQ_channel,dir,ph_offsets).
 %
@@ -27,7 +27,7 @@ end
 dcm = dir(fullfile(folder,dcm_pattern));
 
 dinfo = dicominfo(fullfile(folder,dcm(1).name));
-
+prot = getGEProtocolFromDicom(fullfile(folder,dcm(1).name));
 z0 = double(dinfo.SliceLocation);
 thick = double(dinfo.SliceThickness);
 numofslices = double(dinfo.Private_0021_104f);
@@ -35,6 +35,9 @@ zlocs = z0+[0:numofslices-1].*thick;
 
 for k=numel(dcm):-1:1;
     
+    if mod(k,10)== 0
+        disp(k);
+    end
 %     dinfo(k) = dicominfo(fullfile(folder,dcm(k).name));
 %     z = dinfo(k).InStackPositionNumber;% slice
 %     t = dinfo(k).TemporalPositionIdentifier; %time offset step
@@ -65,7 +68,7 @@ for k=numel(dcm):-1:1;
     
     im=dicomread(fullfile(folder,dcm(k).name));    
     cimgs(:,:,:,z,c,t,d) = im ;
-    dinfos(k)=dinfo;
+%     dinfos(k)=dinfo;
 end
 cimgs=cimgs(:,:,:,:,:,:,nd==1);
 if size(cimgs,5)>1
@@ -78,6 +81,14 @@ if savemat == 1
     sedesc = sedesc;
     fname = sprintf('s%04d_%s',seno,sedesc);
     fname = matlab.lang.makeValidName(fname);
-    cimgs = single(cimgs);
-    save(fname,'cimgs','dinfos');
+%     cimgs = single(cimgs);
+    cimgs = int16(cimgs);
+%     save(fname,'cimgs','dinfos');
+    varinfo=whos('cimgs');
+    if varinfo.bytes > 2e9;% >2GB
+        warning('varible bytes > 2GB, save in .nii format');
+        mat2nii(single(cimgs),[1,1,1],fname);
+    else
+        save(fname,'cimgs','dinfo','prot','-v6');
+    end
 end

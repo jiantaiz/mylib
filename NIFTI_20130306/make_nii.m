@@ -107,10 +107,29 @@ function nii = make_nii(varargin)
    if ndims(nii.img) > 7
       error('NIfTI only allows a maximum of 7 Dimension matrix.');
    end
-
-   maxval = round(double(max(nii.img(:))));
-   minval = round(double(min(nii.img(:))));
-
+   
+   if numel (nii.img) > 1e6
+       switch datatype
+           case 4 %int16
+               maxval  = 2^15;
+               minval  = -2^15;
+               warning('set to range of int16, not the range of image')
+           case 32 %single complex
+               maxval  =  realmax('single');
+               minval  =  realmin('single');
+               warning('set to range of single, not the range of image')
+           case {64,1792}
+               maxval  =  realmax();
+               minval  =  realmin();
+               warning('set to range of double, not the range of image')
+           otherwise
+               maxval = round(double(max(nii.img(:))));
+               minval = round(double(min(nii.img(:))));
+       end
+   else
+       maxval = round(double(max(nii.img(:))));
+       minval = round(double(min(nii.img(:))));
+   end
    nii.hdr = make_header(dims, voxel_size, origin, datatype, ...
 	descrip, maxval, minval);
 

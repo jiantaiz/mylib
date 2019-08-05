@@ -23,7 +23,7 @@ seq2 = -seq1;
 
 if numel(meg_scale) == 1
     meg_scale = ones(1,3).*meg_scale;
-else numel(meg_scale)~=3
+elseif numel(meg_scale)~=3
     error('meg_scale must be scaler or 1x3 vector');
 end
 

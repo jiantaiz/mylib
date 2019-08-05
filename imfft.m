@@ -1,6 +1,6 @@
 function X = imfft(x,dim,mode)
 if nargin<3
-    mode=1
+    mode=1;
 end
 if mode == 1
     X = fftshift(fft(fftshift(x,dim),[],dim),dim);

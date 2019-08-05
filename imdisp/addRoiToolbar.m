@@ -32,6 +32,7 @@ function roi_line_ClickedCallback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 h=imdistline;
+setLabelVisible(h,false); 
 chld = get(h,'Children');
 hcm=get(chld(end),'UIContextmenu');
 item = uimenu(hcm, 'Label', 'X-Y Plot', 'Callback',@(varargin) roi_line_x_y_plot(h) );
@@ -87,6 +88,10 @@ else
 
         y=unwrap(y);
         y = y-mean(y(:));
+%         p = polyfit(x',y,1);
+%         y2 = polyval(p,x');
+%         y = y-y2;
+        
     end
     if ud.popup.Value>1 % smoothing
         smooth_method = ud.popup.String{ud.popup.Value};

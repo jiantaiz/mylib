@@ -33,7 +33,7 @@ if nargin<5
     z_filter= 0;
 end
 
-
+cimgs = single(cimgs);
 sz  = size(cimgs); %sz=[nx,ny,nz,nt,ndir]
 
 if sz(4)~=4 && sz(4)~=8
@@ -61,7 +61,7 @@ phs = angle(cimgs(:,:,:,:,1:2:end).*conj(cimgs(:,:,:,:,2:2:end)));
 
 %  cimgs = lpfilter(cimgs,3,2.5);
 %  cimgs = lpfilter(cimgs,2,2);
-cimgs = lpfilter(cimgs,3,3);
+% cimgs = lpfilter(cimgs,3,2);
 
 %
 %  phs_low_menc = calc_ph_first_harmonic(cimgs(:,:,:,:,1:2:end).*cimgs(:,:,:,:,2:2:end),[],4);
@@ -76,6 +76,9 @@ cimgs = lpfilter(cimgs,3,3);
 
 big_ph_est = complex( zeros( [sz(1:3) 3]));
 phs_x_est = (cimgs(:,:,:,:,1).*cimgs(:,:,:,:,2).*conj(cimgs(:,:,:,:,5)).*conj(cimgs(:,:,:,:,6))); % x-z
+
+phs_x_est = lpfilter(exp(1i*angle(phs_x_est)),3,2);
+
 if high_vib(1) %if low menc already has wrapping along time dimention when using calc_ph_first_harmonic which doubles the phase;
 %     phs_x_est = unwrap(angle(phs_x_est) ,[],4);
     phs_x_est = angle(phs_x_est);
@@ -86,9 +89,12 @@ else
 end
 
 phs_y_est = cimgs(:,:,:,:,3).*cimgs(:,:,:,:,4).*conj(cimgs(:,:,:,:,5)).*conj(cimgs(:,:,:,:,6));%y-z
+phs_y_est = lpfilter(exp(1i*angle(phs_y_est)),3,2);
+
 if high_vib(2)
 %     phs_y_est = unwrap(angle(phs_y_est) ,[],4);
     phs_y_est = angle(phs_y_est);
+%     phs_y_est = unwrap3D_ssh(phs_y_est,1);
     big_ph_est(:,:,:,2) = phs_y_est(:,:,:,1)-phs_y_est(:,:,:,3) + 1i*(phs_y_est(:,:,:,2)-phs_y_est(:,:,:,4));
     big_ph_est(:,:,:,2) = big_ph_est(:,:,:,2).*T(2,2);
 else
@@ -97,6 +103,7 @@ end
 
 
 phs_z_est = cimgs(:,:,:,:,5).*cimgs(:,:,:,:,6);
+phs_z_est = lpfilter(exp(1i*angle(phs_z_est)),3,2);
 
 if high_vib(3)
     

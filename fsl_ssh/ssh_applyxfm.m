@@ -1,6 +1,6 @@
-function outputvol = ssh_applyxfm(inputvol,inputvoxsize,refvol,refvoxsize,omat,ssh2_conn,verbose)
+function outputvol = ssh_applyxfm(inputvol,inputvoxsize,refvol,refvoxsize,omat,ssh2_conn,verbose,option)
 % SSH_APPLYXFM ...
-%    outputvol = SSH_APPLYXFM(inputvol,inputvoxsize,refvol,refvoxsize,omat,ssh2_conn,verbose) ...
+%    outputvol = SSH_APPLYXFM(inputvol,inputvoxsize,refvol,refvoxsize,omat,ssh2_conn,verbose,option) ...
 %
 %    Example:
 %    ... 
@@ -34,6 +34,7 @@ function outputvol = ssh_applyxfm(inputvol,inputvoxsize,refvol,refvoxsize,omat,s
 %%
 if ~exist('ssh2_conn','var'), ssh2_conn = []; end
 if ~exist('verbose','var'), verbose =false; end
+if ~exist('option','var'), option = ''; end
 
 tmp_dir = [tempname,'_tmp']; %get temp dir name
 mkdir(tmp_dir);
@@ -62,7 +63,7 @@ save_nii(nii,tmp_refvol);
 
 
 try
-    [ssh2_conn,command_result]=flirt_wrapper(tmp_inputvol,tmp_refvol,tmp_outputvol,'ssh2_conn',ssh2_conn,'applyxfm',1, 'init',tmp_omat,'verbose',verbose);
+    [ssh2_conn,command_result]=flirt_wrapper(tmp_inputvol,tmp_refvol,tmp_outputvol,'ssh2_conn',ssh2_conn,'applyxfm',1, 'init',tmp_omat,'verbose',verbose,'option',option);
         
     %read in .nii files.
     nii = load_nii( [tmp_outputvol,'.nii.gz']);
